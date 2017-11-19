@@ -14,34 +14,27 @@
 */
 
 /**
- *          to do:
-
-            - when turned on, it checks all open tabs and redirects them
-
-
+            to do:
+            on select change - line 108 - take all tabs w any fb and and change to desiredURL?
 
             done:
-
+            - when turned on, it checks all open tabs and redirects them
  * 
  */
 
 var adrToBlock = [
                     "https://www.facebook.com/", "https://www.facebook.com", 
                     "http://www.facebook.com/", "http://www.facebook.com"
-
                   ],
 tabsToChange = [],
-
-            
 desiredURL = "https://www.facebook.com/saved/?cref=28", //"https://www.facebook.com/groups/" //"https://www.facebook.com/events/"
 redirect = true;
 
-//window.desiredURL = "https://www.facebook.com/saved/?cref=28"
+
+
 
 //  check all tabs when Ext is turned on - 
-//  doesnt work
-    queryTabs();
-    //alert("wejfwfwm  " + window.desiredURL);
+queryTabs();
 
 
 chrome.tabs.onUpdated.addListener( function (tabId, changeInfo, tab) {
@@ -64,14 +57,16 @@ chrome.tabs.onUpdated.addListener( function (tabId, changeInfo, tab) {
 })
 
 chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
-    //alert("now >> " + request.newChoice);
-    /*console.log(sender.tab ?
+    /*alert("now >> " + request.newChoice);
+      /*console.log(sender.tab ?
                 "from a content script:" + sender.tab.url :
                 "from the extension");*/
-    //alert("request\n" + JSON.stringify(request));
+      //alert("request\n" + JSON.stringify(request));
+
+    //
 
 
-    // send to popup if redirection is turned on
+    // send redirection status to popup.js
     if (request.onOffState){
           sendResponse({state: redirect});
           return
@@ -83,17 +78,23 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
           return
     }
 
-    // handling on-off switch from popup
+    // handling on-off switching from popup
     if (request.onOff){
         if (request.onOff == "true") redirect = true
         else redirect = false
 
         if (redirect===false)       chrome.browserAction.setIcon( {path: "icon_sm_off.png"}, function callback(){})
-        else if (redirect === true) chrome.browserAction.setIcon( {path: "icon_sm.png"},     function callback(){})
+        else if (redirect === true) {
+          
+                chrome.browserAction.setIcon( {path: "icon_sm.png"},     function callback(){})
+      
+                queryTabs();
+        }
 
         return
     }
 
+    // if desiredURL changed via popup.html
     if (request.newChoice){
         switch(request.newChoice){
           case "saved items": window.desiredURL = "https://www.facebook.com/saved/?cref=28"; break;
@@ -103,63 +104,54 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
           case "other":       window.desiredURL = "" ; break;
           //default: window.desiredURL = "";
         }
+
+        // take all tabs w fb open and change to desiredURL?
+
     }
-    //alert("desiredURL: " + desiredURL)
-    /*  sendResponse({farewell: "goodbye"});
-    */  
+    
   });
+
 
 
 
 
 
 function queryTabs(){
-  //var cons = document.getElementById("console");
-  //let p = document.createElement('p')
-  //alert(cons);
+        //var cons = document.getElementById("console");
+          //let p = document.createElement('p')
+          //alert(cons);
 
-  //alert("query tabs");
-  
-  //alert(desiredURL);
-  //p.innerHTML = desiredURL;
-  //cons.appendChild(p);
+          //alert("query tabs");
+          
+          //alert(desiredURL);
+          //p.innerHTML = desiredURL;
+          //cons.appendChild(p);
 
 
-  chrome.tabs.query({}, function(tabs){
+        chrome.tabs.query({}, function(tabs){
 
-      //alert(adsToFilter)
+            //var ul = document.getElementById('tabList');
+            let tabUrl;  
 
-      //var ul = document.getElementById('tabList');
-      
+            tabs.forEach(tab => {
 
-      tabs.forEach(tab => {
+                  tabUrl = tab.url
 
-        //let li = document.createElement("li");
-        //let content = JSON.stringify(tab.url + "    " + tab.id + "   <<<<");
-        //li.innerHTML = content;
-        //ul.appendChild(li);
+                  let updateProps = { url: window.desiredURL }
+                  
 
-        window.tabUrl = tab.url
+                  if ( adrToBlock.some(matchesTabURL)  ){
+                                //alert("fb page open");
+                                chrome.tabs.update(tab.id, updateProps);
+                  }  
 
-        //if (url === "https://www.facebook.com/") alert("bad url  " + url)
+            });
 
-        let updateProps = {
-                //url: window.desiredURL //"https://www.w3schools.com/colors/colors_picker.asp"
+
+            function matchesTabURL(adr){
+                          return adr === tabUrl 
             }
-        
-
-        if ( adrToBlock.some(matchesTabURL)  ){
-                      //alert("fb page open");
-                      //chrome.tabs.update(tab.id, updateProps, function(){});
-                      //tabsToChange.push(tab.id)
-        }
-        
-
-      });
-      function matchesTabURL(adr){
-        return adr === window.tabUrl 
-      }
-  });
+        });
 }
 
 
