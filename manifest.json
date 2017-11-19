@@ -13,8 +13,10 @@
     "background",
     "tabs",
     "activeTab"
+    //"browserAction"
    ],
   "background":{
-    "scripts": ["bck.js"]
+    "scripts": ["bck.js"],
+    "persistent": true
   }
 }
