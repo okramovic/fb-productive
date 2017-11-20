@@ -4,34 +4,37 @@
   <title>fb made productive</title>
   <script type="text/javascript" src="popup.js"></script>
 </head>
-<body style="width: 150px">
+<body style="width: 150px; display: flex; flex-direction:column; ">
 
 
-      <h4>redirect fb homepage</h4>
+      <h4 style="text-align: center; align-self: center">redirect fb homepage</h4>
+      <hr style="width: 100%">
 
-      <label for="onOff">on/off</label> 
-      <input id="onOff" type="checkbox">
+      <div style="align-self: center; margin: 10px 0px;">
+          <label for="onOff" >active</label> 
+          <input id="onOff"   type="checkbox">
+      </div>
 
-      <br/>
-      <br/>
-      <label for="redirectTo" style="margin-bottom: 10px;">redirect to:</label>
-      <select id="redirectTo" style="margin-top: 10px;">
-        <option value="https://www.facebook.com/saved/?cref=28" >saved items</option>
-        <option value="https://www.facebook.com/messages/">messages</option>
-        <option value="https://www.facebook.com/events/" >events</option>
-        <option value="https://www.facebook.com/groups/">groups</option>
-        <option value="">other</option>
-      </select>
+      <hr style="width: 100%">
 
+
+      <div style="align-self: center; 
+                  display: flex; flex-direction:column; align-items: center; 
+                  margin: 10px 0px;">
+                  
+          <label for="redirectTo" style="margin-bottom: 0px;">redirect to:</label>
+          <select id="redirectTo" style="margin-top: 10px;">
+            <option value="https://www.facebook.com/saved/?cref=28" >saved items</option>
+            <option value="https://www.facebook.com/messages/">messages</option>
+            <option value="https://www.facebook.com/events/" >events</option>
+            <option value="https://www.facebook.com/groups/">groups</option>
+            <!--option value="">other</option-->
+          </select>
+      </div>
       <!--h4>my console</h4>
       <p id="console"></p-->
 
       <!--h4>tabs open</h4>
-      <ul id="tabList"-->
-        
-        
-      </ul>
-
-
+      <ul id="tabList"></ul-->
 </body>
 </html>
