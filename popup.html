@@ -3,14 +3,22 @@
 <head>
   <title>fb made productive</title>
   <script type="text/javascript" src="popup.js"></script>
+  <style>
+      input[type='text']::placeholder{ text-align: center;}
+      .labelSmall{
+        font-size: 10px;
+        color: gray;
+        margin-bottom: 5px;
+      }
+  </style>
 </head>
-<body style="width: 150px; display: flex; flex-direction:column; ">
+<body style="width: 200px; display: flex; flex-direction:column; ">
 
 
       <h4 style="text-align: center; align-self: center">redirect fb homepage</h4>
-      <hr style="width: 100%">
+      <!--hr style="width: 100%"-->
 
-      <div style="align-self: center; margin: 10px 0px;">
+      <div style="display: none; align-self: center; margin: 10px 0px;">
           <label for="onOff" >active</label> 
           <input id="onOff"   type="checkbox">
       </div>
@@ -21,15 +29,32 @@
       <div style="align-self: center; 
                   display: flex; flex-direction:column; align-items: center; 
                   margin: 10px 0px;">
-                  
+
           <label for="redirectTo" style="margin-bottom: 0px;">redirect to:</label>
           <select id="redirectTo" style="margin-top: 10px;">
-            <option value="https://www.facebook.com/saved/?cref=28" >saved items</option>
-            <option value="https://www.facebook.com/messages/">messages</option>
-            <option value="https://www.facebook.com/events/" >events</option>
-            <option value="https://www.facebook.com/groups/">groups</option>
-            <!--option value="">other</option-->
+                <option value="https://www.facebook.com/saved/?cref=28" >saved items</option>
+                <option value="https://www.facebook.com/messages/">messages</option>
+                <option value="https://www.facebook.com/events/" >events</option>
+                <option value="https://www.facebook.com/groups/">groups</option>
+                <option >my URL</option>
           </select>
+      </div>
+
+      <!-- onsubmit="formSubmit(ev)" -->
+      <!--form id="myform" 
+            style="align-self: center; 
+                  display: flex; flex-direction:column; align-items: center; 
+                  margin: 10px 0px; width: 95%">
+          
+      </form-->
+      <div style="align-self: center; width: 95%;
+                  display: flex; flex-direction:column; align-items: center; 
+                  margin: 10px 0px;">
+
+            <label class="labelSmall">custom link</label>
+            <textarea id="customURL" type="text" rows="4" placeholder="your custom URL" style="width: 100%;" ></textarea>
+            <button id="button" style="margin-top: 10px; width: auto;">set link</button>
+
       </div>
       <!--h4>my console</h4>
       <p id="console"></p-->

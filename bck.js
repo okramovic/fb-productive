@@ -16,24 +16,30 @@
 
 /**
             to do:
-            - store user settings to some storage for next time
-
-            - on select change - line 108 - take all tabs w any fb and and change to desiredURL?
+            - user can set 1 custom address
+            
 
             done:
             - when turned on, it checks all open tabs and redirects them
+            - store user settings to some storage for next time
+
+            not to do
+            - on select change - line 108 - take all tabs w any fb and and change to desiredURL?
  * 
  */
 
 var adrToBlock = [
                     "https://www.facebook.com/", "https://www.facebook.com", 
-                    "http://www.facebook.com/", "http://www.facebook.com"
+                    "http://www.facebook.com/", "http://www.facebook.com",
+                    "https://www.facebook.com/?ref=tn_tnmn"
                   ],
 tabsToChange = [],
 desiredURL = "https://www.facebook.com/saved/?cref=28", //"https://www.facebook.com/groups/" //"https://www.facebook.com/events/"
 redirect = true,
-storageExists = false,
-initialSettings = {'on': redirect, 'to': desiredURL};
+customURL = null,
+
+//storageExists = false,
+initialSettings = {'on': redirect, 'to': desiredURL, 'customURL': customURL };
 
 
 //chrome.storage.local.clear(function(){alert("all cleared")})
@@ -72,7 +78,7 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
                 "from a content script:" + sender.tab.url :
                 "from the extension");*/
     //
-
+      //console.log("request",request)
 
     // send redirection status to popup.js
     if (request.onOffState){
@@ -84,6 +90,11 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
     if (request.redirectTo){
           sendResponse({to: desiredURL});
           //return
+    }
+
+    if (request.forCustomURL){
+          console.log("customURL to send", customURL)
+          sendResponse({customURL: customURL});
     }
 
     // on-off switching from popup
@@ -108,7 +119,7 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
           case "messages":    desiredURL = "https://www.facebook.com/messages/"; break;
           case "events":      desiredURL = "https://www.facebook.com/events/"; break;
           case "groups":      desiredURL = "https://www.facebook.com/groups/"; break;
-          //case "other":       window.desiredURL = "" ; break;
+          case "my URL":      desiredURL = request.customURL ; break;
           //default: window.desiredURL = "";
         }
 
@@ -117,7 +128,23 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
 
     }
     
-  });
+    if (request.newCustomURL){
+        let url = request.newCustomURL
+        
+
+        desiredURL = "my URL"
+        customURL = url.toString()
+        //console.log("new user input", customURL)
+        chrome.storage.local.set({'to': desiredURL, 'customURL': customURL })
+
+        //loadStorage()
+
+
+        chrome.storage.local.get(null, function(items){
+          //console.log(items )
+        }) 
+    }
+});
 
 
 
@@ -189,27 +216,14 @@ function loadStorage(){
       loadStorage();
 
     } else {
-            //alert("cnt: "+cnt);
-            
-            /*if (cnt === 0){
-                chrome.storage.local.set({'storageSet': true})
-                chrome.storage.local.set({'on': redirect, 'to': desiredURL})
-                
-             
-            //} else{*/
-                chrome.storage.local.get(['on', 'to'], function(vals){
+            chrome.storage.local.get(['on', 'to', 'customURL'], function(vals){
                           //alert("sukces " +JSON.stringify(vals));
-                  
+                          console.log(vals);
                           redirect = vals.on;
                           desiredURL = vals.to;
-                          console.log("redirect", redirect," to", desiredURL)
+                          customURL = vals.customURL
+                          //console.log("redirect", redirect," to", desiredURL, "\ncustom", customURL)
                           updateIcon()
-
-                    //alert(JSON.stringify(vals))
-            //    })
-
-                
-
 
             })
 
@@ -222,16 +236,32 @@ function updateIcon(){
 
       if (redirect === false) {
           chrome.browserAction.setIcon( {path: "./icon_32_off.png"}, function(){ 
-                  console.log('set to off')  
+                  // console.log('set to off')  
           })}
 
       else if (redirect === true) {
 
           chrome.browserAction.setIcon( {path: "./icon_32_on.png"}, function callback(){
-                  console.log('set to ON')
+                 // console.log('set to ON')
             
           })
 
           queryTabs();
       }
+}
+
+
+function xhrTest(){
+/**
+ *  https://stackoverflow.com/questions/25107774/how-do-i-send-an-http-get-request-in-chrome-extension
+ */
+var xttp = new XMLHttpRequest();
+xttp.open('GET', 'https://www.mocky.io/v2/5a1544362e0000a50feab5e1', true);
+xttp.onreadystatechange = function (resp){
+        console.log('xttp resp', resp);
+        console.log('xttp this', this.responseText);
+}
+xttp.send();
+
+
 }
