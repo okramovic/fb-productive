@@ -6,7 +6,7 @@
   "version": "0.0.1",
 
   "browser_action": {
-   "default_icon": "icon_64_on.png",
+   "default_icon": "icon_32_on.png",
    "default_popup": "popup.html"
   },
   "permissions": [
@@ -19,6 +19,6 @@
    ],
   "background":{
     "scripts": ["bck.js"],
-    "persistent": true
+    "persistent": false
   }
 }

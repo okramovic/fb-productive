@@ -38,20 +38,25 @@ desiredURL = "https://www.facebook.com/saved/?cref=28", //"https://www.facebook.
 redirect = true,
 customURL = null,
 
-//storageExists = false,
 initialSettings = {'on': redirect, 'to': desiredURL, 'customURL': customURL };
 
 
 //chrome.storage.local.clear(function(){alert("all cleared")})
-loadStorage()
+loadStorage(queryTabs)
 
-//chrome.storage.local.set({'on': redirect, 'to': desiredURL}, function() {
-  //alert("setting");
-//})
 
-//  check all tabs when Ext is turned on - 
-queryTabs();
 
+chrome.runtime.onStartup.addListener(function(){
+    alert("onStartup");
+    //console.log("onStartup")
+    //loadStorage(queryTabs)
+})
+
+chrome.runtime.onInstalled.addListener(function(){
+            //alert("onInstalled");
+            console.log("onInstalled")
+            loadStorage(queryTabs)
+})
 
 chrome.tabs.onUpdated.addListener( function (tabId, changeInfo, tab) {
     
@@ -79,6 +84,15 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
                 "from the extension");*/
     //
       //console.log("request",request)
+    if (request.initialize){
+        //alert('init');
+        chrome.storage.local.get(['on', 'to', 'customURL'], function(vals){
+                console.log("init vals\n",JSON.stringify( vals))
+                
+                sendResponse({resp: vals});
+                chrome.runtime.sendMessage(vals)
+        })
+    }
 
     // send redirection status to popup.js
     if (request.onOffState){
@@ -93,8 +107,11 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
     }
 
     if (request.forCustomURL){
-          console.log("customURL to send", customURL)
-          sendResponse({customURL: customURL});
+          setTimeout(function(){
+            sendResponse({customURL: customURL});
+            console.log(">> customURL was sent", customURL)
+          },500)
+          
     }
 
     // on-off switching from popup
@@ -110,7 +127,9 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
         //return
     }
 
-    // if desiredURL changed via popup.html
+
+
+    // if Select element changed via popup.html
     if (request.newChoice){
         //let oldChoice = desiredURL
 
@@ -119,7 +138,7 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
           case "messages":    desiredURL = "https://www.facebook.com/messages/"; break;
           case "events":      desiredURL = "https://www.facebook.com/events/"; break;
           case "groups":      desiredURL = "https://www.facebook.com/groups/"; break;
-          case "my URL":      desiredURL = request.customURL ; break;
+          case "my URL":      desiredURL = customURL ; break;
           //default: window.desiredURL = "";
         }
 
@@ -131,19 +150,30 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
     if (request.newCustomURL){
         let url = request.newCustomURL
         
+        if (url === "empty"){
+            chrome.storage.local.set({'customURL': null })
+            customURL = null
+            console.log("setting storage customURL >>", customURL)
+            return
+        }
 
-        desiredURL = "my URL"
+        //desiredURL = "my URL"
         customURL = url.toString()
-        //console.log("new user input", customURL)
-        chrome.storage.local.set({'to': desiredURL, 'customURL': customURL })
+        console.log("setting storage customURL >>", customURL)
+
+        chrome.storage.local.set({'customURL': customURL })
 
         //loadStorage()
 
 
-        chrome.storage.local.get(null, function(items){
-          //console.log(items )
-        }) 
+        
     }
+
+
+
+    chrome.storage.local.get(null, function(items){
+        //console.log("local storage now\n", items )
+      }) 
 });
 
 
@@ -192,13 +222,13 @@ function queryTabs(){
 
 
 
-function loadStorage(){
+function loadStorage(cb){
 
 
   chrome.storage.local.get(['on'], function(items){
 
     //alert("loading storage\n" + "\n"+JSON.stringify(items));
-    console.log("storage items " + JSON.stringify(items));
+    //console.log("storage items " + JSON.stringify(items));
 
     var cnt = 0
 
@@ -207,24 +237,26 @@ function loadStorage(){
     }
 
 
-    if (items === {} || cnt === 0) {
+    if (cnt === 0) {
 
       console.log('--> empty storage');
 
       //chrome.storage.local.set({'storageSet': true})
       chrome.storage.local.set(initialSettings)
-      loadStorage();
+      loadStorage(queryTabs);
 
     } else {
             chrome.storage.local.get(['on', 'to', 'customURL'], function(vals){
                           //alert("sukces " +JSON.stringify(vals));
-                          console.log(vals);
+                          console.log("storage vals\n", JSON.stringify(vals));
                           redirect = vals.on;
                           desiredURL = vals.to;
                           customURL = vals.customURL
                           //console.log("redirect", redirect," to", desiredURL, "\ncustom", customURL)
-                          updateIcon()
+                          //console.log("redirect to", desiredURL, "\ncustomURL", customURL)
+                          //updateIcon()
 
+                          if (cb) cb()
             })
 
       
@@ -252,16 +284,14 @@ function updateIcon(){
 
 
 function xhrTest(){
-/**
- *  https://stackoverflow.com/questions/25107774/how-do-i-send-an-http-get-request-in-chrome-extension
- */
-var xttp = new XMLHttpRequest();
-xttp.open('GET', 'https://www.mocky.io/v2/5a1544362e0000a50feab5e1', true);
-xttp.onreadystatechange = function (resp){
-        console.log('xttp resp', resp);
-        console.log('xttp this', this.responseText);
-}
-xttp.send();
-
-
+        /**
+         *  https://stackoverflow.com/questions/25107774/how-do-i-send-an-http-get-request-in-chrome-extension
+         */
+        var xttp = new XMLHttpRequest();
+        xttp.open('GET', 'https://www.mocky.io/v2/5a1544362e0000a50feab5e1', true);
+        xttp.onreadystatechange = function (resp){
+                console.log('xttp resp', resp);
+                console.log('xttp this', this.responseText);
+        }
+        xttp.send();
 }
