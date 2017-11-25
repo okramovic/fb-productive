@@ -19,6 +19,6 @@
    ],
   "background":{
     "scripts": ["bck.js"],
-    "persistent": true
+    "persistent": false
   }
 }

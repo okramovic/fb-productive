@@ -93,7 +93,7 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
     }
 
     if (request.forCustomURL){
-          console.log("customURL to send", customURL)
+          //console.log("customURL to send", customURL)
           sendResponse({customURL: customURL});
     }
 
@@ -110,7 +110,9 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
         //return
     }
 
-    // if desiredURL changed via popup.html
+
+
+    // if Select element changed via popup.html
     if (request.newChoice){
         //let oldChoice = desiredURL
 
@@ -119,7 +121,7 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
           case "messages":    desiredURL = "https://www.facebook.com/messages/"; break;
           case "events":      desiredURL = "https://www.facebook.com/events/"; break;
           case "groups":      desiredURL = "https://www.facebook.com/groups/"; break;
-          case "my URL":      desiredURL = request.customURL ; break;
+          case "my URL":      desiredURL = customURL ; break;
           //default: window.desiredURL = "";
         }
 
@@ -132,18 +134,20 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
         let url = request.newCustomURL
         
 
-        desiredURL = "my URL"
+        //desiredURL = "my URL"
         customURL = url.toString()
-        //console.log("new user input", customURL)
-        chrome.storage.local.set({'to': desiredURL, 'customURL': customURL })
+        console.log("setting storage customURL >>", customURL)
+
+        chrome.storage.local.set({'customURL': customURL })
 
         //loadStorage()
 
 
-        chrome.storage.local.get(null, function(items){
-          //console.log(items )
-        }) 
+        
     }
+    chrome.storage.local.get(null, function(items){
+        console.log("local storage now\n", items )
+      }) 
 });
 
 
@@ -207,7 +211,7 @@ function loadStorage(){
     }
 
 
-    if (items === {} || cnt === 0) {
+    if (cnt === 0) {
 
       console.log('--> empty storage');
 
@@ -218,12 +222,13 @@ function loadStorage(){
     } else {
             chrome.storage.local.get(['on', 'to', 'customURL'], function(vals){
                           //alert("sukces " +JSON.stringify(vals));
-                          console.log(vals);
+                          console.log("storage vals\n", vals);
                           redirect = vals.on;
                           desiredURL = vals.to;
                           customURL = vals.customURL
                           //console.log("redirect", redirect," to", desiredURL, "\ncustom", customURL)
-                          updateIcon()
+                          console.log("redirect to", desiredURL, "\ncustomURL", customURL)
+                          //updateIcon()
 
             })
 
@@ -252,16 +257,14 @@ function updateIcon(){
 
 
 function xhrTest(){
-/**
- *  https://stackoverflow.com/questions/25107774/how-do-i-send-an-http-get-request-in-chrome-extension
- */
-var xttp = new XMLHttpRequest();
-xttp.open('GET', 'https://www.mocky.io/v2/5a1544362e0000a50feab5e1', true);
-xttp.onreadystatechange = function (resp){
-        console.log('xttp resp', resp);
-        console.log('xttp this', this.responseText);
-}
-xttp.send();
-
-
+        /**
+         *  https://stackoverflow.com/questions/25107774/how-do-i-send-an-http-get-request-in-chrome-extension
+         */
+        var xttp = new XMLHttpRequest();
+        xttp.open('GET', 'https://www.mocky.io/v2/5a1544362e0000a50feab5e1', true);
+        xttp.onreadystatechange = function (resp){
+                console.log('xttp resp', resp);
+                console.log('xttp this', this.responseText);
+        }
+        xttp.send();
 }
