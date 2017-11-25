@@ -38,20 +38,25 @@ desiredURL = "https://www.facebook.com/saved/?cref=28", //"https://www.facebook.
 redirect = true,
 customURL = null,
 
-//storageExists = false,
 initialSettings = {'on': redirect, 'to': desiredURL, 'customURL': customURL };
 
 
 //chrome.storage.local.clear(function(){alert("all cleared")})
-loadStorage()
+loadStorage(queryTabs)
 
-//chrome.storage.local.set({'on': redirect, 'to': desiredURL}, function() {
-  //alert("setting");
-//})
 
-//  check all tabs when Ext is turned on - 
-queryTabs();
 
+chrome.runtime.onStartup.addListener(function(){
+    alert("onStartup");
+    //console.log("onStartup")
+    //loadStorage(queryTabs)
+})
+
+chrome.runtime.onInstalled.addListener(function(){
+            //alert("onInstalled");
+            console.log("onInstalled")
+            loadStorage(queryTabs)
+})
 
 chrome.tabs.onUpdated.addListener( function (tabId, changeInfo, tab) {
     
@@ -79,6 +84,15 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
                 "from the extension");*/
     //
       //console.log("request",request)
+    if (request.initialize){
+        //alert('init');
+        chrome.storage.local.get(['on', 'to', 'customURL'], function(vals){
+                console.log("init vals\n",JSON.stringify( vals))
+                
+                sendResponse({resp: vals});
+                chrome.runtime.sendMessage(vals)
+        })
+    }
 
     // send redirection status to popup.js
     if (request.onOffState){
@@ -93,8 +107,11 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
     }
 
     if (request.forCustomURL){
-          //console.log("customURL to send", customURL)
-          sendResponse({customURL: customURL});
+          setTimeout(function(){
+            sendResponse({customURL: customURL});
+            console.log(">> customURL was sent", customURL)
+          },500)
+          
     }
 
     // on-off switching from popup
@@ -133,6 +150,12 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
     if (request.newCustomURL){
         let url = request.newCustomURL
         
+        if (url === "empty"){
+            chrome.storage.local.set({'customURL': null })
+            customURL = null
+            console.log("setting storage customURL >>", customURL)
+            return
+        }
 
         //desiredURL = "my URL"
         customURL = url.toString()
@@ -145,8 +168,11 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
 
         
     }
+
+
+
     chrome.storage.local.get(null, function(items){
-        console.log("local storage now\n", items )
+        //console.log("local storage now\n", items )
       }) 
 });
 
@@ -196,13 +222,13 @@ function queryTabs(){
 
 
 
-function loadStorage(){
+function loadStorage(cb){
 
 
   chrome.storage.local.get(['on'], function(items){
 
     //alert("loading storage\n" + "\n"+JSON.stringify(items));
-    console.log("storage items " + JSON.stringify(items));
+    //console.log("storage items " + JSON.stringify(items));
 
     var cnt = 0
 
@@ -217,19 +243,20 @@ function loadStorage(){
 
       //chrome.storage.local.set({'storageSet': true})
       chrome.storage.local.set(initialSettings)
-      loadStorage();
+      loadStorage(queryTabs);
 
     } else {
             chrome.storage.local.get(['on', 'to', 'customURL'], function(vals){
                           //alert("sukces " +JSON.stringify(vals));
-                          console.log("storage vals\n", vals);
+                          console.log("storage vals\n", JSON.stringify(vals));
                           redirect = vals.on;
                           desiredURL = vals.to;
                           customURL = vals.customURL
                           //console.log("redirect", redirect," to", desiredURL, "\ncustom", customURL)
-                          console.log("redirect to", desiredURL, "\ncustomURL", customURL)
+                          //console.log("redirect to", desiredURL, "\ncustomURL", customURL)
                           //updateIcon()
 
+                          if (cb) cb()
             })
 
       

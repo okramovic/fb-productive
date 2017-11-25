@@ -1,78 +1,96 @@
 var onOffState = null, redirectTo = null, customURL = null;
 
+        
+        // get initial redirect Choice
+        /*chrome.runtime.sendMessage({redirectTo: 1 }, function(response) {
+        
+                  //alert("response\n" + JSON.stringify(response));
+                  redirectTo = response.to
+                  let opts = document.getElementById("redirectTo").options
+        
+                // if its custom url choice
+                if (  redirectTo !== "https://www.facebook.com/saved/?cref=28" &&
+                      redirectTo !== "https://www.facebook.com/messages/" &&
+                      redirectTo !== "https://www.facebook.com/events/" &&
+                      redirectTo !== "https://www.facebook.com/groups/"
+                    ){
+                      //alert('custom url\n' + opts + " <<" );
+                      for (var i=0; i < opts.length; i++){
+        
+                                opts[i].selected = false
+        
+                                if (i=== opts.length-1) document.getElementById("userOpt").selected = true;
+                      }
+        
+                // all other choices
+                } else {
+        
+                  for (var i=0; i<opts.length; i++){
+                          if (opts[i].value === redirectTo) 
+                          document.getElementById("redirectTo").selectedIndex = i;
+                  }
+                }
+            })*/
+        
+        //
+
+        
+        // get custom url from storage
+        /*chrome.runtime.sendMessage({forCustomURL: 1 }, function(response) {
+                window.customURL = response.customURL
+
+                let customURL = response.customURL
+        
+                //alert("custom url  " + customURL + " <<")
+        
+                if (customURL === null || customURL === undefined) {
+        
+                      //alert("empty url  ")
+                      disableMyURLOption()
+                      updateMyURLOption(null)
+        
+                } else {
+        
+                      // set input field
+                      //document.getElementById('customURL').value = customURL
+        
+                      enableMyURLOption()
+                      updateMyURLOption(customURL)
+                  }
+        
+        })*/
+
+
+
+// get msg with initial settings
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
+
+                setCustomURL(request.customURL)
+                setSelect(request.to)
+                setOnOff(request.on)
+
+})
+
 
 
 
 document.addEventListener('DOMContentLoaded', () => {
     //alert('hi');
 
-
-    // set initial state of on-off switch
-    chrome.runtime.sendMessage({onOffState: 1 }, function(response) {
-
-                onOffState = response.state
-                document.getElementById("onOff").checked = onOffState
-    
+    chrome.runtime.sendMessage({initialize: 1}, function(response){
+        
+                setTimeout(function(){
+                        
+                        //document.getElementById('customURL').value = "OXOXO"
+                //document.getElementById('customURL').value = "___"//res//.customURL
+                setTimeout(function(){
+                                        
+                                        //document.getElementById('customURL').value = "OXOXO"
+                        //document.getElementById('customURL').value = response
+                },1000)
+                },1000)
     })
 
-    // get initial redirect Choice
-    chrome.runtime.sendMessage({redirectTo: 1 }, function(response) {
-
-          //alert("response\n" + JSON.stringify(response));
-          redirectTo = response.to
-          let opts = document.getElementById("redirectTo").options
-
-        // if its custom url choice
-        if (  redirectTo !== "https://www.facebook.com/saved/?cref=28" &&
-              redirectTo !== "https://www.facebook.com/messages/" &&
-              redirectTo !== "https://www.facebook.com/events/" &&
-              redirectTo !== "https://www.facebook.com/groups/"
-            ){
-              //alert('custom url\n' + opts + " <<" );
-              for (var i=0; i < opts.length; i++){
-
-                        opts[i].selected = false
-
-                        if (i=== opts.length-1) document.getElementById("userOpt").selected = true;
-              }
-              /*opts.forEach(function(el){
-                      alert("sel was " + el.selected)
-                      el.selected = false
-              });*/
-              
-
-        // all other choices
-        } else {
-
-          for (var i=0; i<opts.length; i++){
-                  if (opts[i].value === redirectTo) 
-                  document.getElementById("redirectTo").selectedIndex = i;
-          }
-        }
-    })
-
-    // get custom url from storage
-    chrome.runtime.sendMessage({forCustomURL: 1 }, function(response) {
-
-        let customURL = response.customURL
-
-        //alert("custom url  " + customURL)
-
-        if (customURL === null || customURL === undefined) {
-
-              disableMyURLOption()
-              updateMyURLOption(null)
-
-        } else {
-
-              // set input field
-              document.getElementById('customURL').value = customURL
-
-              enableMyURLOption()
-              updateMyURLOption(customURL)
-          }
-
-    })
 
 
 
@@ -107,7 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (input.trim() === "") {
 
                     disableMyURLOption()
-                    chrome.runtime.sendMessage({newCustomURL: null }, function(response){})
+                    chrome.runtime.sendMessage({newCustomURL: "empty" }, function(response){})
                     //return
                     
                     selectFirstOpt()
@@ -210,7 +228,6 @@ function updateMyURLOption(newVal,cb){
                         }*/
 
 }
-
 function selectMyURL(cb){
   
             /*  let opts = document.getElementById("redirectTo").options
@@ -244,7 +261,6 @@ function selectMyURL(cb){
                 
                 chrome.runtime.sendMessage({newChoice: "my URL"}, function(response) {});
 }
-
 function selectFirstOpt(){
         let opts = document.getElementById("redirectTo").options
         for (var i=0; i < opts.length; i++){
@@ -256,4 +272,71 @@ function selectFirstOpt(){
         //choice = sel.options[sel.selectedIndex].text
 
         chrome.runtime.sendMessage({newChoice: opts[0].text });
+}
+
+//  set select
+function setSelect(value){
+        redirectTo = value
+        let opts = document.getElementById("redirectTo").options
+
+        // if its custom url choice
+        if (  redirectTo !== "https://www.facebook.com/saved/?cref=28" &&
+                redirectTo !== "https://www.facebook.com/messages/" &&
+                redirectTo !== "https://www.facebook.com/events/" &&
+                redirectTo !== "https://www.facebook.com/groups/"
+                ){
+                //alert('custom url\n' + opts + " <<" );
+                for (var i=0; i < opts.length; i++){
+
+                        opts[i].selected = false
+
+                        if (i=== opts.length-1) document.getElementById("userOpt").selected = true;
+                }
+
+        // all other choices
+        } else {
+
+                for (var i=0; i<opts.length; i++){
+                        if (opts[i].value === redirectTo) 
+                        document.getElementById("redirectTo").selectedIndex = i;
+                }
+        }       
+}
+
+
+
+// init custom url
+function setCustomURL(url) {
+        //window.customURL = response.customURL
+
+        //document.querySelector('h4').innerHTML = url;
+
+        let customURL = url
+
+        //alert("custom url  " + customURL + " <<")
+
+        if (customURL === null || customURL === undefined) {
+
+              //alert("empty url  ")
+              disableMyURLOption()
+              updateMyURLOption(null)
+
+        } else {
+
+              // set input field
+              document.getElementById('customURL').value = customURL
+
+              enableMyURLOption()
+              updateMyURLOption(customURL)
+          }
+
+}
+
+
+// set onOff
+function setOnOff(val){
+
+        //document.querySelector('h4').innerHTML = val + " is typeof " + typeof val
+        onOffState = val
+        document.getElementById("onOff").checked = val
 }
