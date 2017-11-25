@@ -31,7 +31,7 @@
 var adrToBlock = [
                     "https://www.facebook.com/", "https://www.facebook.com", 
                     "http://www.facebook.com/", "http://www.facebook.com",
-                    "https://www.facebook.com/?ref=tn_tnmn"
+                    "https://www.facebook.com/?ref=tn_tnmn","http://www.facebook.com/?ref=tn_tnmn"
                   ],
 tabsToChange = [],
 desiredURL = "https://www.facebook.com/saved/?cref=28", //"https://www.facebook.com/groups/" //"https://www.facebook.com/events/"
@@ -182,16 +182,6 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
 
 
 function queryTabs(){
-        //var cons = document.getElementById("console");
-          //let p = document.createElement('p')
-          //alert(cons);
-
-          //alert("query tabs");
-          
-          //alert(desiredURL);
-          //p.innerHTML = desiredURL;
-          //cons.appendChild(p);
-
 
         chrome.tabs.query({}, function(tabs){
 

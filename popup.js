@@ -1,3 +1,8 @@
+var adrToBlock = [
+        "https://www.facebook.com/", "https://www.facebook.com", 
+        "http://www.facebook.com/", "http://www.facebook.com",
+        "https://www.facebook.com/?ref=tn_tnmn","http://www.facebook.com/?ref=tn_tnmn"
+      ]
 var onOffState = null, redirectTo = null, customURL = null;
 
         
@@ -97,7 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Select change
     let sel = document.getElementById("redirectTo")
     sel.addEventListener('change', newURLSelection);
-                                   function newURLSelection(){
+    function newURLSelection(){
         
                         let sel = document.getElementById("redirectTo")
                         
@@ -122,6 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 
             let input = document.getElementById('customURL').value
 
+            // reset input to ""
             if (input.trim() === "") {
 
                     disableMyURLOption()
@@ -130,6 +136,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     selectFirstOpt()
 
+            } else if ( adrToBlock.some(function matchesInput(adr){ 
+                        return adr === input.trim()})) {
+
+                    displayError()
 
             } else {
                     //alert("click: " + input)
@@ -140,15 +150,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     })
             }
 
-            // to save customURL to local storage
-            
-                  //let sel = document.getElementById('redirectTo')
-
-            
-            
+            // to save customURL to local storage            
             
     })
-    //alert(document.getElementById("submButton"))
+    
+
+
+    // hovering over my URL label
+    document.getElementById('customCont').addEventListener('mouseover', function(){
+
+                document.getElementById('customDiv').style.display= 'flex'
+    })
+    document.getElementById('customCont').addEventListener('mouseout', function(){
+        
+                document.getElementById('customDiv').style.display= 'none'
+    })
 });
 
 
@@ -163,9 +179,6 @@ function onSwitch(){
       })
       
 }
-
-
-
 function disableMyURLOption(){
 
     //let opts = document.getElementById("redirectTo").options
@@ -274,6 +287,8 @@ function selectFirstOpt(){
         chrome.runtime.sendMessage({newChoice: opts[0].text });
 }
 
+
+
 //  set select
 function setSelect(value){
         redirectTo = value
@@ -303,11 +318,9 @@ function setSelect(value){
         }       
 }
 
-
-
 // init custom url
 function setCustomURL(url) {
-        //window.customURL = response.customURL
+        window.customURL = url
 
         //document.querySelector('h4').innerHTML = url;
 
@@ -332,11 +345,37 @@ function setCustomURL(url) {
 
 }
 
-
 // set onOff
 function setOnOff(val){
 
         //document.querySelector('h4').innerHTML = val + " is typeof " + typeof val
         onOffState = val
         document.getElementById("onOff").checked = val
+}
+
+
+function displayError(previous){
+        let node = document.createElement('h3')
+        node.setAttribute('style', 'margin: 10px; '+
+                          'text-align:center; color:#3b5998;' + 
+                          'line-height: 135% ;')
+        //node.style.textAlign = "center" 
+        //node.style.color= "#3b5998"
+
+        node.id = "errorMsg"
+        node.innerHTML = 'this is FB homepage address' +
+                         ', change to another one please'
+        document.body.appendChild(node)
+
+        setTimeout(function(){
+                let el = document.getElementById('errorMsg')
+                el.parentNode.removeChild(el)
+
+                if (window.customURL)
+                     document.getElementById('customURL').value = window.customURL
+
+                else document.getElementById('customURL').value = ""
+
+                //window.close()
+        },5000)
 }
