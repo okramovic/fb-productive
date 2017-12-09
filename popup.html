@@ -2,26 +2,30 @@
 <html>
 <head>
   <title>fb made productive</title>
+  <meta charset="utf-8">
   <script type="text/javascript" src="popup.js"></script>
   <style>
-      /*input[type='text']::placeholder{ text-align: center;}*/
       h4{
             font-size: 20px;
             font-weight: 100;
 
             margin: 10px 0px 0px;
       }
+      a{
+            outline: none;
+            text-decoration: none;
+      }
+      a:hover{
+            /*color: #3b5998;
+            font-size: 40px;*/
+            color: red;
+      }
       select{
             border: 1px solid;
-            /*border-bottom: none;/*1px solid;*/
             outline: none;
 
             background-color: white;
-            /*border-radius: 10px;
-            -webkit-border-radius: 10px;
-            -webkit-border-bottom-right-radius:0px;
-            -webkit-border-bottom-left-radius:0px;*/
-
+            
             font-size: 20px;
             font-weight: 100;
             text-align-last: center;
@@ -31,7 +35,6 @@
 
       }
       select:active, selected:hover{
-            /*border: none;*/
             outline: none;
       }
       .labelSmall{
@@ -60,23 +63,20 @@
   </style>
 </head>
 <body style="width: 200px;
-             display: flex; flex-direction:column; align-items:center; 
-            ">
+             display: flex; flex-direction:column; align-items:center;">
 
 
-      <h4 style="text-align: center; align-self: center">just redirect FB</h4>
+      <h4 style="text-align: center; align-self: center; cursor: default">just red<a target="_blank" href="https://twitter.com/okram_ovic">i</a>rect FB</h4>
 
-
-      <div style="display: none; align-self: center; margin: 10px 0px;">
+      <!-- turned off in this version -->
+      <!--div style="display: none; align-self: center; margin: 10px 0px;">
           <label for="onOff" >active</label> 
           <input id="onOff"   type="checkbox">
-      </div>
-      <!--hr style="width: 100%"-->
+      </div-->
 
 
-      <div style=" width: 100%; border: 0px solid; margin-top: 10px;
-                  display: flex; flex-direction:column; align-items: center; 
-                  ">
+      <div style=" width: 100%; margin-top: 10px;
+                  display: flex; flex-direction:column; align-items: center; ">
 
           <label for="redirectTo" class="labelSmall" 
                  style="margin-bottom: 0px;">to:</label>
@@ -94,22 +94,18 @@
                   display: flex; flex-direction:column; align-items: center; " >
             <label id="customLabel" class="labelSmall" style="margin: 10px 0px 10px;"
                         >my url: &#10549;</label>
-            <div id="customDiv" style=" width: 100%;
-                        display: none; flex-direction:column; align-items: center; 
-                        margin: 0px 0px 15px; ">
+            <div id="customDiv" 
+                 style=" width: 100%;
+                         display: none; flex-direction:column; align-items: center; 
+                         margin: 0px 0px 15px; ">
 
                   
                   <textarea id="customURL" type="text" rows="4" 
-                        placeholder="add one custom URL" 
+                        placeholder="add one custom URL"
                   ></textarea>
                   <button id="button" style="margin-top: 20px; width: auto;">update url</button>
 
             </div>
       </div>
-      <!--h4>my console</h4>
-      <p id="console"></p-->
-
-      <!--h4>tabs open</h4>
-      <ul id="tabList"></ul-->
 </body>
 </html>
