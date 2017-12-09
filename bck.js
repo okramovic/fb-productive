@@ -47,7 +47,7 @@ loadStorage(queryTabs)
 
 
 chrome.runtime.onStartup.addListener(function(){
-    alert("onStartup");
+    //alert("onStartup");
     //console.log("onStartup")
     //loadStorage(queryTabs)
 })
