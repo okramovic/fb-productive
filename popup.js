@@ -54,31 +54,32 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById("button").addEventListener('click', function(){
                 
             let input = document.getElementById('customURL').value
+            if (input) input = input.trim()
 
-            // reset input to ""
-            if (input.trim() === "") {
+            // reset input to empty
+            if (!input){//.trim() === "") {
 
                     disableMyURLOption()
                     chrome.runtime.sendMessage({newCustomURL: "empty" })
                     
                     selectFirstOpt()
 
+            //  error displays when user enters fb homepage (one of its forms)
             } else if ( adrToBlock.some(function matchesInput(adr){ 
                         return adr === input.trim()})) {
 
                     displayError()
 
+            // save customURL to local storage  
             } else {
-                    //alert("click: " + input)
+                    
                     chrome.runtime.sendMessage({newCustomURL: input }, function(response){})
                     enableMyURLOption()
                     updateMyURLOption(input, function(){
                         selectMyURL()
                     })
             }
-
-            // to save customURL to local storage            
-            
+                        
     })
     
 
@@ -206,7 +207,7 @@ function setOnOff(val){
         document.getElementById("onOff").checked = val
 }
 
-
+// this 'fires' when user enters on of banned URLs
 function displayError(previous){
         let node = document.createElement('h3')
         node.setAttribute('style', 'margin: 10px; '+
