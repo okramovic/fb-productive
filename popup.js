@@ -15,9 +15,9 @@ var onOffState = null, redirectTo = null, customURL = null;
 // get msg with initial settings
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
 
-                setCustomURL(request.customURL)
-                setSelect(request.to)
-                setOnOff(request.on)
+               setCustomURL(request.customURL)
+               setSelect(request.to)
+               setOnOff(request.on)
 
 })
 

@@ -13,9 +13,7 @@
     "background",
     "tabs",
     "activeTab",
-    "storage",
-    "https://www.mocky.io/*"
-    //"browserAction"
+    "storage"
    ],
   "background":{
     "scripts": ["bck.js"],
